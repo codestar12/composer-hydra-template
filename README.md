@@ -1,0 +1,1 @@
+# composer-hydra-template
