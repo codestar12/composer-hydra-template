@@ -1,0 +1,36 @@
+train_dataset:
+  _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
+  datadir: data/
+  download: true
+
+train_dataloader:
+  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
+  # batch_size: 1024
+  prefetch_factor: 2
+  num_workers: 8
+  persistent_workers: true
+  pin_memory: true
+  timeout: 0
+
+train_dataspec:
+  _target_: composer.core.DataSpec
+
+eval_dataset:
+  _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
+  datadir: data/
+  download: false
+  is_train: false
+
+eval_dataloader:
+  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
+  # batch_size: 1024
+  prefetch_factor: 2
+  num_workers: 8
+  persistent_workers: true
+  pin_memory: true
+  timeout: 0
+
+eval_dataspec:
+  _target_: composer.core.DataSpec
+
+batch_size: 1024

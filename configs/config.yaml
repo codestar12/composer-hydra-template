@@ -1,0 +1,42 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - model: resnet.yaml
+  - dataset: cifar10.yaml
+  - logger: null
+
+algorithms:
+  channels_last:
+    _target_: composer.algorithms.ChannelsLast
+  blurpool:
+    _target_: composer.algorithms.BlurPool
+    blur_first: true
+    min_channels: 16
+    replace_convs: true
+    replace_maxpools: true
+  label_smoothing:
+    _target_: composer.algorithms.LabelSmoothing
+    smoothing: 0.1
+
+trainer:
+  _target_: composer.Trainer
+  device: gpu
+  max_duration: 160ep
+  grad_accum: 1
+
+scheduler:
+  _target_: composer.optim.scheduler.CosineAnnealingWithWarmupScheduler
+  alpha_f: 0.0
+  t_max: 1dur
+  t_warmup: 10ep
+
+optimizer:
+  _target_: composer.optim.DecoupledSGDW
+  lr: 0.05
+  momentum: 0.9
+  weight_decay: 2.0e-3
+
+name: hydra-test-run
+
+
