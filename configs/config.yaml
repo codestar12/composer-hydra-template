@@ -2,7 +2,7 @@
 
 defaults:
   - _self_
-  - model: resnet.yaml
+  - model: cifar_resnet.yaml
   - dataset: streaming_cifar10.yaml
   - logger: null
   - callbacks:  
