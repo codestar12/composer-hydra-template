@@ -4,7 +4,7 @@ import hydra
 from omegaconf import DictConfig
 from composer import Trainer, Callback, Logger, ComposerModel
 from composer.loggers.logger_destination import LoggerDestination
-from composer.core import Algorithm
+from composer.core import Algorithm, DataSpec
 from composer.utils import dist
 from pyparsing import Optional
 
@@ -22,19 +22,38 @@ def train(config: DictConfig) -> None:
 
     optimizer = hydra.utils.instantiate(config.optimizer, params=model.parameters())
 
-    train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
-    train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
-    train_dataspec = hydra.utils.instantiate(
-        config.dataset.train_dataspec,
-        train_dataset.initialize_object(config.dataset.batch_size // dist.get_world_size(), train_dataloader),
-    )
 
-    eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
-    eval_dataset = hydra.utils.instantiate(config.dataset.eval_dataset)
-    eval_dataspec = hydra.utils.instantiate(
-        config.dataset.eval_dataspec,
-        eval_dataset.initialize_object(config.dataset.batch_size // dist.get_world_size(), eval_dataloader),
-    )
+    with dist.run_local_rank_zero_first():
+        train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
+        train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
+        train_dataspec: DataSpec = None
+        if "train_dataspec" in config.dataset:
+            train_dataspec = hydra.utils.instantiate(
+                config.dataset.train_dataspec,
+                train_dataset.initialize_object(
+                    config.dataset.batch_size // dist.get_world_size(), train_dataloader
+                ),
+            )
+        else:
+            train_dataspec = train_dataset.initialize_object(
+                config.dataset.batch_size // dist.get_world_size(), train_dataloader
+            )
+
+    with dist.run_local_rank_zero_first():
+        eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
+        eval_dataset = hydra.utils.instantiate(config.dataset.eval_dataset)
+        eval_dataspec: DataSpec = None
+        if "eval_dataspec" in config.dataset:
+            eval_dataspec = hydra.utils.instantiate(
+                config.dataset.eval_dataspec,
+                eval_dataset.initialize_object(
+                    config.dataset.batch_size // dist.get_world_size(), eval_dataloader
+                ),
+            )
+        else:
+            eval_dataspec = train_dataset.initialize_object(
+                config.dataset.batch_size // dist.get_world_size(), eval_dataloader
+            )
 
     logger: List[LoggerDestination] = []
     callbacks: List[Callback] = []
@@ -57,7 +76,7 @@ def train(config: DictConfig) -> None:
             if "_target_" in call_conf:
                 print(f"Instantiating callbacks <{call_conf._target_}>")
                 callbacks.append(hydra.utils.instantiate(call_conf))
-    
+
     scheduler = hydra.utils.instantiate(config.scheduler)
 
     trainer: Trainer = hydra.utils.instantiate(

@@ -1,7 +1,9 @@
 train_dataset:
-  _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
-  datadir: data/
-  download: true
+  _target_: composer.datasets.cifar_hparams.StreamingCIFAR10Hparams
+  remote: s3://mosaicml-internal-dataset-cifar10/mds/1/
+  local: /tmp/mds-cache/mds-cifar10/
+  split: train
+  shuffle: true
 
 train_dataloader:
   _target_: composer.datasets.dataset_hparams.DataLoaderHparams
@@ -16,10 +18,11 @@ train_dataspec:
   _target_: composer.core.DataSpec
 
 eval_dataset:
-  _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
-  datadir: data/
-  download: true
-  is_train: false
+  _target_: composer.datasets.cifar_hparams.StreamingCIFAR10Hparams
+  remote: s3://mosaicml-internal-dataset-cifar10/mds/1/
+  local: /tmp/mds-cache/mds-cifar10/
+  split: val
+  shuffle: false
 
 eval_dataloader:
   _target_: composer.datasets.dataset_hparams.DataLoaderHparams

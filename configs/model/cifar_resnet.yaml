@@ -1,0 +1,6 @@
+_target_: composer.models.ComposerResNetCIFAR
+model_name: resnet_56
+num_classes: 10
+initializers:
+  - kaiming_normal
+  - bn_uniform

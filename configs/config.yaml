@@ -3,7 +3,7 @@
 defaults:
   - _self_
   - model: resnet.yaml
-  - dataset: cifar10.yaml
+  - dataset: streaming_cifar10.yaml
   - logger: null
   - callbacks:  
     - lr_monitor.yaml
@@ -29,7 +29,7 @@ trainer:
   _target_: composer.Trainer
   device: gpu
   max_duration: 160ep
-  grad_accum: 1
+  grad_accum: auto
   run_name: ${name}
 
 scheduler:
