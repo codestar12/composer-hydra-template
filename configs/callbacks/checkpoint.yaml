@@ -1,0 +1,4 @@
+checkpoint:
+  _target_: composer.callbacks.CheckpointSaver
+  folder: ckpts/{run_name}
+  num_checkpoints_to_keep: 4

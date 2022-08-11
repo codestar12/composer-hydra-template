@@ -5,6 +5,7 @@ from omegaconf import DictConfig
 from composer import Trainer, Callback, Logger, ComposerModel
 from composer.loggers.logger_destination import LoggerDestination
 from composer.core import Algorithm
+from composer.utils import dist
 from pyparsing import Optional
 
 
@@ -25,18 +26,18 @@ def train(config: DictConfig) -> None:
     train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
     train_dataspec = hydra.utils.instantiate(
         config.dataset.train_dataspec,
-        train_dataset.initialize_object(config.dataset.batch_size, train_dataloader),
+        train_dataset.initialize_object(config.dataset.batch_size // dist.get_world_size(), train_dataloader),
     )
 
     eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
     eval_dataset = hydra.utils.instantiate(config.dataset.eval_dataset)
     eval_dataspec = hydra.utils.instantiate(
         config.dataset.eval_dataspec,
-        eval_dataset.initialize_object(config.dataset.batch_size, eval_dataloader),
+        eval_dataset.initialize_object(config.dataset.batch_size // dist.get_world_size(), eval_dataloader),
     )
 
     logger: List[LoggerDestination] = []
-
+    callbacks: List[Callback] = []
     algorithms: List[Algorithm] = []
 
     if "logger" in config:
@@ -50,6 +51,12 @@ def train(config: DictConfig) -> None:
             if "_target_" in ag_conf:
                 print(f"Instantiating algorithm <{ag_conf._target_}>")
                 algorithms.append(hydra.utils.instantiate(ag_conf))
+
+    if "callbacks" in config:
+        for _, call_conf in config.callbacks.items():
+            if "_target_" in call_conf:
+                print(f"Instantiating callbacks <{call_conf._target_}>")
+                callbacks.append(hydra.utils.instantiate(call_conf))
     
     scheduler = hydra.utils.instantiate(config.scheduler)
 
@@ -62,5 +69,6 @@ def train(config: DictConfig) -> None:
         loggers=logger,
         algorithms=algorithms,
         schedulers=scheduler,
+        callbacks=callbacks,
     )
-    trainer.fit()
+    return trainer.fit()

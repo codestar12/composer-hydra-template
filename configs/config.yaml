@@ -5,6 +5,12 @@ defaults:
   - model: resnet.yaml
   - dataset: cifar10.yaml
   - logger: null
+  - callbacks:  
+    - lr_monitor.yaml
+    - speed_monitor.yaml
+    - checkpoint.yaml
+
+name: hydra-test-run
 
 algorithms:
   channels_last:
@@ -18,12 +24,13 @@ algorithms:
   label_smoothing:
     _target_: composer.algorithms.LabelSmoothing
     smoothing: 0.1
-
+    
 trainer:
   _target_: composer.Trainer
   device: gpu
   max_duration: 160ep
   grad_accum: 1
+  run_name: ${name}
 
 scheduler:
   _target_: composer.optim.scheduler.CosineAnnealingWithWarmupScheduler
@@ -37,6 +44,5 @@ optimizer:
   momentum: 0.9
   weight_decay: 2.0e-3
 
-name: hydra-test-run
 
 
