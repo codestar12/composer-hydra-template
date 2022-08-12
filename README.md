@@ -40,7 +40,7 @@ The default configs train a ResNet model on Cifar10. Switching to Imagenet and R
 └-- run.py
 ```
 <details>
-    <summary><h3>How is this different then yahp?</h3></summary>
+    <summary><h3>How is this different than yahp?</h3></summary>
 
 Yahp also uses yaml and configures objects for train. The difference is that code **doesn't** have to be added to the composer/yahp registery to be used with composer. Lets compare the yahp and hydra configs to see the difference dding algorithms in the yaph based mild ResNet recipe.
 
