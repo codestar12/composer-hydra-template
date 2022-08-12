@@ -1,0 +1,4 @@
+_target_: composer.models.ComposerClassifier
+module:
+  _target_: src.models.resnet9.ResNet9
+  num_classes: 10
