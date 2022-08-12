@@ -1,4 +1,4 @@
-_target_: composer.models.ComposerClassifier
+_target_: composer.models.ComposerClassifier # <-- composer model wrapper
 module:
-  _target_: src.models.resnet9.ResNet9
+  _target_: src.models.resnet9.ResNet9       # <-- local path to your code
   num_classes: 10
