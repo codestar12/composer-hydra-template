@@ -171,7 +171,7 @@ class ResNet9(nn.Module):
 
 ### 2) Write a config in the matching directory in `configs/`
 
-
+Here we load an instance of our custom pytorch ResNet9 model and pass it as an argument to the ComposerClassifier constructor. That's it!
 
 ```yaml
 _target_: composer.models.ComposerClassifier    # <-- composer model wrapper
@@ -181,4 +181,4 @@ module:
 ```
 </details>
 
-`src/models/resnet9.py`
+## 
