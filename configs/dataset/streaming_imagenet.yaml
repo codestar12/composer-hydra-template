@@ -3,7 +3,7 @@ train_dataset:
   _target_: composer.datasets.imagenet_hparams.StreamingImageNet1kHparams
   remote: s3://mosaicml-internal-dataset-imagenet1k/mds/1/
   local: /tmp/mds-cache/mds-imagenet1k/
-  split: train
+  is_train: true
   resize_size: -1
   crop_size: 224
   shuffle: true
@@ -22,7 +22,7 @@ eval_dataset:
   _target_: composer.datasets.imagenet_hparams.StreamingImageNet1kHparams
   remote: s3://mosaicml-internal-dataset-imagenet1k/mds/1/
   local: /tmp/mds-cache/mds-imagenet1k/
-  split: val
+  is_train: false
   resize_size: 256
   crop_size: 224
   shuffle: false
