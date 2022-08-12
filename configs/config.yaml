@@ -12,8 +12,8 @@ defaults:
     - speed_monitor.yaml
     - checkpoint.yaml
   - trainer: default.yaml
-  - experiment: null
   - algorithms: null
+  - experiment: null
 
 name: hydra-test-run
 
