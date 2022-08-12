@@ -4,7 +4,17 @@ A clean and scalable template to kickstart your deep learning project (inspired 
 
 Click on [<kbd>Use this template</kbd>](https://github.com/codestar12/composer-hydra-template/generate) to initialize new repository.
 
-## Project
+## Get Started
+
+To launch composer with hydra simple run 
+
+`python run.py` or for multi-gpu jobs `composer -n <n> run.py`
+
+The default configs train a ResNet model on Cifar10. Switching to Imagenet and ResNet50 and adding wandb logging is as simple as overwriting the defaults on the commandline.
+
+`composer -n <n> run.py model=resnet.yaml dataset=streaming_imagenet.yaml logger=wandb.yaml`
+
+## Project Structure
 
 ```
 .
