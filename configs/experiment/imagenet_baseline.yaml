@@ -1,0 +1,21 @@
+# @package _global_
+defaults:
+ - override /trainer: default.yaml
+ - override /model: resnet.yaml
+ - override /dataset: streaming_imagenet.yaml
+ - override /scheduler: default.yaml
+ - override /optimizer: default.yaml
+ - override /logger: wandb.yaml
+
+trainer:
+  max_duration: 90ep
+
+scheduler:
+  t_warmup: 8ep
+
+optimizer:
+  lr: 2.048
+  momentum: 0.875
+  weight_decay: 5.0e-4
+  dampening: 0
+  nesterov: false

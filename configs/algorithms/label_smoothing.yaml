@@ -1,0 +1,2 @@
+_target_: composer.algorithms.LabelSmoothing
+smoothing: 0.1

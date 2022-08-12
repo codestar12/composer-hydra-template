@@ -1,0 +1,4 @@
+_target_: composer.optim.DecoupledSGDW
+lr: 0.05
+momentum: 0.9
+weight_decay: 2.0e-3

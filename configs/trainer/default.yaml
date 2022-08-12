@@ -1,0 +1,5 @@
+_target_: composer.Trainer
+device: gpu
+max_duration: 160ep
+grad_accum: auto
+run_name: ${name}

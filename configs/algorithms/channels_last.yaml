@@ -1,0 +1,2 @@
+channels_last:
+  _target_: composer.algorithms.ChannelsLast
