@@ -1,3 +1,4 @@
+# @package _global_
 defaults:
  - override /trainer: default.yaml
  - override /model: resnet.yaml
