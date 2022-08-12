@@ -29,12 +29,12 @@ Click on [<kbd>Use this template</kbd>](https://github.com/codestar12/composer-h
 |-- requirements.txt
 └-- run.py
 ```
+<details>
+    <summary><h3>How is this different then yahp?</h3></summary>
 
-## How is this different then yahp?
+Yahp also uses yaml and configures objects for train. The difference is that code **doesn't** have to be added to the composer/yahp registery to be used with composer. Lets compare the yahp and hydra configs to see the difference dding algorithms in the yaph based mild ResNet recipe.
 
-#### Yahp also uses yaml and configures objects for train. The difference is that code **doesn't** have to be added to the composer/yahp registery to be used with composer. Lets compare the yahp and hydra configs to see the difference dding algorithms in the yaph based mild ResNet recipe.
-
-### Yahp:
+Yahp:
 ```yaml
 algorithms:
   blurpool:                                      # <-- names are specific keys which need to match a yahp intializer the yahp registery
@@ -58,7 +58,8 @@ algorithms:
     size_increment: 4
 ```
 
-### Hydra:
+
+Hydra:
 ```yaml
 algorithms:
   blurpool:                                     # <-- names don't need to match but can be referenced
@@ -86,7 +87,11 @@ algorithms:
     resize_targets: false
     size_increment: 4
 ```
-## How do I add my own code?
+
+</details>
+
+<details>
+    <summary><h3>How do I add my own code?</h3></summary>
 
 ### 1) Write the code in src (An example is provided in `src/models/resnet9.py`)
 
