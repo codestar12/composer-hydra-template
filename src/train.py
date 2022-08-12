@@ -51,7 +51,7 @@ def train(config: DictConfig) -> None:
                 ),
             )
         else:
-            eval_dataspec = train_dataset.initialize_object(
+            eval_dataspec = eval_dataset.initialize_object(
                 config.dataset.batch_size // dist.get_world_size(), eval_dataloader
             )
 
