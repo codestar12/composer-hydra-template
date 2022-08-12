@@ -13,6 +13,7 @@ defaults:
     - checkpoint.yaml
   - trainer: default.yaml
   - experiment: null
+  - algorithms: null
 
 name: hydra-test-run
 

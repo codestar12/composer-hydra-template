@@ -6,6 +6,7 @@ defaults:
  - override /scheduler: default.yaml
  - override /optimizer: default.yaml
  - override /logger: wandb.yaml
+ - override /algorithms: null
 
 trainer:
   max_duration: 90ep
