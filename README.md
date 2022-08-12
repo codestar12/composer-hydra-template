@@ -29,6 +29,63 @@ Click on [<kbd>Use this template</kbd>](https://github.com/codestar12/composer-h
 |-- requirements.txt
 └-- run.py
 ```
+
+## How is this different then yahp?
+
+#### Yahp also uses yaml and configures objects for train. The difference is that code **doesn't** have to be added to the composer/yahp registery to be used with composer. Lets compare the yahp and hydra configs to see the difference dding algorithms in the yaph based mild ResNet recipe.
+
+### Yahp:
+```yaml
+algorithms:
+  blurpool:                                      # <-- names are specific keys which need to match a yahp intializer the yahp registery
+    blur_first: true
+    min_channels: 16
+    replace_convs: true
+    replace_maxpools: true
+  channels_last: {}
+  ema:
+    half_life: 100ba
+    train_with_ema_weights: false
+    update_interval: 20ba
+  label_smoothing:
+    smoothing: 0.08
+  progressive_resizing:
+    delay_fraction: 0.4
+    finetune_fraction: 0.2
+    initial_scale: 0.5
+    mode: resize
+    resize_targets: false
+    size_increment: 4
+```
+
+### Hydra:
+```yaml
+algorithms:
+  blurpool:                                     # <-- names don't need to match but can be referenced
+    _target_: composer.algorithms.BlurPool      # <-- objects are initialled by the import target provided to the _target_:
+    blur_first: true                            # <-- any kwargs in composer.algorithms.BlurPool will can be filled
+    min_channels: 16
+    replace_convs: true
+    replace_maxpools: true
+  channels_last:
+    _target_: composer.algorithms.ChannelsLast
+  label_smoothing:
+    _target_: composer.algorithms.LabelSmoothing
+    smoothing: 0.1
+  ema:
+    _target_: composer.algorithms.EMA
+    half_life: 100ba
+    train_with_ema_weights: false
+    update_interval: 20ba
+  progressive_resizing:
+    _target_: composer.algorithms.ProgressiveResizing
+    delay_fraction: 0.4
+    finetune_fraction: 0.2
+    initial_scale: 0.5
+    mode: resize
+    resize_targets: false
+    size_increment: 4
+```
 ## How do I add my own code?
 
 ### 1) Write the code in src (An example is provided in `src/models/resnet9.py`)
