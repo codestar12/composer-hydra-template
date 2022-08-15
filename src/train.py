@@ -5,7 +5,7 @@ from omegaconf import DictConfig
 from composer import Trainer, Callback, Logger, ComposerModel
 from composer.loggers.logger_destination import LoggerDestination
 from composer.core import Algorithm, DataSpec
-from composer.utils import dist
+from composer.utils import dist, reproducibility
 from pyparsing import Optional
 
 
@@ -18,10 +18,11 @@ def train(config: DictConfig) -> None:
         Optional[float]: Metric score for hyperparameter optimization
     """
 
+    reproducibility.seed_all(config['seed'])
+
     model: ComposerModel = hydra.utils.instantiate(config.model)
 
     optimizer = hydra.utils.instantiate(config.optimizer, params=model.parameters())
-
 
     with dist.run_local_rank_zero_first():
         train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
