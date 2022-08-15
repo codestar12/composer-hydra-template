@@ -1,7 +1,7 @@
 # @package _global_
 
 defaults:
-  - _self_
+  - _self_                     # <-- configs defined in this yaml. They are overwritten by all following defaults
   - model: cifar_resnet.yaml
   - dataset: streaming_cifar10.yaml
   - logger: null
@@ -12,9 +12,10 @@ defaults:
     - speed_monitor.yaml
     - checkpoint.yaml
   - trainer: default.yaml
-  - algorithms: null
+  - algorithms: null 
   - experiment: null
 
+seed: 42
 name: hydra-test-run
 
 
