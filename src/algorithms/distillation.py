@@ -7,7 +7,7 @@ from composer.models import ComposerModel
 import torch.nn as nn
 import torch
 
-from mcontrib.algorithms.distillation.distillation_kl_loss import DistillKL
+from .distillation_kl_loss import DistillKL
 
 class Distillation(Algorithm):
     """_summary_
@@ -85,7 +85,8 @@ class Distillation(Algorithm):
         """Ensures the tensors of a teacher model are on the same device as a destination model."""
         with torch.no_grad():
             #device = next(destination_model.parameters()).device
-            self.teacher.to(torch.cuda.current_device())
+            if torch.cuda.is_available():
+                self.teacher.to(torch.cuda.current_device())
             # destination_params = destination_model.parameters()
             # teacher_params = teacher_model.parameters()
             # teacher_model.param_list = [s.to(d.device) for s, d in zip(teacher_params, destination_params)]

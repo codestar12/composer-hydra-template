@@ -1,0 +1,28 @@
+
+# @package _global_
+defaults:
+ - override /trainer: default.yaml
+ - override /model: resnet.yaml
+ - override /dataset: streaming_imagenet.yaml
+ - override /scheduler: default.yaml
+ - override /optimizer: default.yaml
+ - override /logger: wandb.yaml
+ - override /algorithms: null
+
+algorithms:
+  distillation:
+    _target_: src.algorithms.distillation.Distillation
+    teacher:
+      _target_: composer.models.ComposerClassifier
+      module:
+        _target_: src.models.resnet9.ResNet9
+        num_classes: 10
+    teacher_weights_pth: /Users/codyml/composer-hydra-template/ckpts/hydra-test-run/ep30-ba1440-rank0
+
+
+optimizer:
+  lr: 0.1
+  momentum: 0.875
+  weight_decay: 5.0e-4
+  dampening: 0
+  nesterov: false
