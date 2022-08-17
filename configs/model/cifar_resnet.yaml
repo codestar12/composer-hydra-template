@@ -1,4 +1,4 @@
-_target_: composer.models.ComposerResNetCIFAR
+_target_: composer.models.composer_resnet_cifar
 model_name: resnet_56
 num_classes: 10
 initializers:

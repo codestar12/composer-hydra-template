@@ -1,4 +1,4 @@
-_target_: composer.models.ComposerResNet
+_target_: composer.models.composer_resnet
 model_name: resnet50
 num_classes: 1000
 pretrained: false
