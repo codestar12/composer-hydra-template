@@ -29,6 +29,7 @@ class Distillation(Algorithm):
             org_loss_weight: float = 0.1,
             input_key: Union[str, int] = 0,
             teacher_weights_pth: str = None,
+            teacher_transforms: Optional[]
         ):
         super().__init__()
         self.teacher = teacher
@@ -95,4 +96,5 @@ class Distillation(Algorithm):
             # teacher_buffers = teacher_model.buffers()
             # teacher_model.buffer_list = [s.to(d.device) for s, d in zip(teacher_buffers, destination_buffers)]
 
+    def _apply_teacher_transforms(self, )
 
