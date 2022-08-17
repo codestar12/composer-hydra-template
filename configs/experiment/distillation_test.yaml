@@ -13,15 +13,20 @@ algorithms:
   distillation:
     _target_: src.algorithms.distillation.Distillation
     teacher:
-      _target_: composer.models.ComposerClassifier
-      module:
-        _target_: src.models.resnet9.ResNet9
-        num_classes: 10
-    teacher_weights_pth: /Users/codyml/composer-hydra-template/ckpts/hydra-test-run/ep30-ba1440-rank0
+      _target_: composer.models.ComposerResNet
+      model_name: resnet50
+      num_classes: 1000
+      pretrained: false
+      initializers: 
+        - kaiming_normal
+        - bn_uniform
+    teacher_weights_pth: ./ckpts/imagenet-teacher/ep6-ba3750-rank0
 
+scheduler:
+  t_warmup: 8ep
 
 optimizer:
-  lr: 0.1
+  lr: 2.048
   momentum: 0.875
   weight_decay: 5.0e-4
   dampening: 0
