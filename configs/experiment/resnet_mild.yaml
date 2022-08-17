@@ -10,23 +10,23 @@ defaults:
 
 algorithms:
   blurpool:
-    _target_: composer.algorithms.BlurPool
+    _target_: composer.algorithms.blurpool
     blur_first: true
     min_channels: 16
     replace_convs: true
     replace_maxpools: true
   channels_last:
-    _target_: composer.algorithms.ChannelsLast
+    _target_: composer.algorithms.channelslast
   label_smoothing:
-    _target_: composer.algorithms.LabelSmoothing
+    _target_: composer.algorithms.labelsmoothing
     smoothing: 0.1
   ema:
-    _target_: composer.algorithms.EMA
+    _target_: composer.algorithms.ema
     half_life: 100ba
     train_with_ema_weights: false
     update_interval: 20ba
   progressive_resizing:
-    _target_: composer.algorithms.ProgressiveResizing
+    _target_: composer.algorithms.progressiveresizing
     delay_fraction: 0.4
     finetune_fraction: 0.2
     initial_scale: 0.5
@@ -36,7 +36,7 @@ algorithms:
 
 trainer:
   max_duration: 90ep
-  precision: AMP
+  precision: amp
   scale_schedule_ratio: 0.4
 
 scheduler:
