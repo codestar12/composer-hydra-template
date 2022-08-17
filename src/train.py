@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from composer import Trainer, Callback, Logger, ComposerModel
 from composer.loggers.logger_destination import LoggerDestination
 from composer.core import Algorithm, DataSpec
@@ -24,37 +24,38 @@ def train(config: DictConfig) -> None:
 
     optimizer = hydra.utils.instantiate(config.optimizer, params=model.parameters())
 
-    with dist.run_local_rank_zero_first():
-        train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
-        train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
-        train_dataspec: DataSpec = None
-        if "train_dataspec" in config.dataset:
-            train_dataspec = hydra.utils.instantiate(
-                config.dataset.train_dataspec,
-                train_dataset.initialize_object(
-                    config.dataset.batch_size // dist.get_world_size(), train_dataloader
-                ),
-            )
-        else:
-            train_dataspec = train_dataset.initialize_object(
-                config.dataset.batch_size // dist.get_world_size(), train_dataloader
-            )
+    train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
+    train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
+    train_dataspec: DataSpec = None
+    if "train_dataspec" in config.dataset:
+        train_dataspec = hydra.utils.instantiate(
+            config.dataset.train_dataspec,
+            train_dataset.initialize_object(
+                config.dataset.train_batch_size // dist.get_world_size(), train_dataloader
+            ),
+        )
+    else:
+        train_dataspec = train_dataset.initialize_object(
+            config.dataset.train_batch_size // dist.get_world_size(), train_dataloader
+        )
 
-    with dist.run_local_rank_zero_first():
-        eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
-        eval_dataset = hydra.utils.instantiate(config.dataset.eval_dataset)
-        eval_dataspec: DataSpec = None
-        if "eval_dataspec" in config.dataset:
-            eval_dataspec = hydra.utils.instantiate(
-                config.dataset.eval_dataspec,
-                eval_dataset.initialize_object(
-                    config.dataset.batch_size // dist.get_world_size(), eval_dataloader
-                ),
-            )
-        else:
-            eval_dataspec = eval_dataset.initialize_object(
-                config.dataset.batch_size // dist.get_world_size(), eval_dataloader
-            )
+    assert not ("eval_dataset" in config.dataset and "evaluators" in config.dataset), \
+        f"evaluators and eval_dataset found in config.dataset. Use only one \n{OmegaConf.to_yaml(config.dataset)}"
+    
+    eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
+    eval_dataset = hydra.utils.instantiate(config.dataset.eval_dataset)
+    eval_dataspec: DataSpec = None
+    if "eval_dataspec" in config.dataset:
+        eval_dataspec = hydra.utils.instantiate(
+            config.dataset.eval_dataspec,
+            eval_dataset.initialize_object(
+                config.dataset.eval_batch_size // dist.get_world_size(), eval_dataloader
+            ),
+        )
+    else:
+        eval_dataspec = eval_dataset.initialize_object(
+            config.dataset.eval_batch_size // dist.get_world_size(), eval_dataloader
+        )
 
     logger: List[LoggerDestination] = []
     callbacks: List[Callback] = []

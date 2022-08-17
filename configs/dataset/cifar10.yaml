@@ -1,3 +1,7 @@
+batch_size: 1024
+train_batch_size: ${batch_size}
+eval_batch_size: ${batch_size}
+
 train_dataset:
   _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
   datadir: data/
@@ -5,7 +9,6 @@ train_dataset:
 
 train_dataloader:
   _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  # batch_size: 1024
   prefetch_factor: 2
   num_workers: 8
   persistent_workers: true
@@ -23,7 +26,6 @@ eval_dataset:
 
 eval_dataloader:
   _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  # batch_size: 1024
   prefetch_factor: 2
   num_workers: 8
   persistent_workers: true
@@ -32,5 +34,3 @@ eval_dataloader:
 
 eval_dataspec:
   _target_: composer.core.DataSpec
-
-batch_size: 1024

@@ -1,4 +1,8 @@
 
+batch_size: 2048
+train_batch_size: ${dataset.batch_size}
+eval_batch_size: ${dataset.batch_size}
+
 train_dataset:
   _target_: composer.datasets.imagenet_hparams.StreamingImageNet1kHparams
   remote: s3://mosaicml-internal-dataset-imagenet1k/mds/1/
@@ -10,7 +14,6 @@ train_dataset:
 
 train_dataloader:
   _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  # batch_size: 1024
   prefetch_factor: 2
   num_workers: 8
   persistent_workers: true
@@ -36,6 +39,3 @@ eval_dataloader:
   persistent_workers: true
   pin_memory: true
   timeout: 0
-
-
-batch_size: 2048
