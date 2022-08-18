@@ -8,6 +8,8 @@ defaults:
  - override /logger: null
  - override /algorithms: null
 
+seed: 17
+
 model:
   _target_: composer.models.create_bert_mlm
   use_pretrained: false
@@ -95,8 +97,8 @@ trainer:
   save_folder: bert_checkpoints # The directory to save checkpoints to
   save_interval: 3500ba # Save checkpoints every 3500 batches
   eval_interval: 1000ba
+  seed: ${seed}
 
-seed: 17
 
 
 loggers:

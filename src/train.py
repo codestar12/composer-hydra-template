@@ -93,10 +93,15 @@ def train(config: DictConfig) -> None:
     algorithms: List[Algorithm] = []
 
     if "logger" in config:
-        for _, lg_conf in config.logger.items():
+        for log, lg_conf in config.logger.items():
             if "_target_" in lg_conf:
                 print(f"Instantiating logger <{lg_conf._target_}>")
-                logger.append(hydra.utils.instantiate(lg_conf))
+                if log == "wandb":
+                    container = OmegaConf.to_container(config, resolve=True, throw_on_missing=True)
+                    wandb_logger = hydra.utils.instantiate(lg_conf, _partial_=True) # use _partail_ so it doesn't try to init everything 
+                    logger.append(wandb_logger(init_kwargs={"config": container}))
+                else:
+                    logger.append(hydra.utils.instantiate(lg_conf))
 
     if "algorithms" in config:
         for _, ag_conf in config.algorithms.items():

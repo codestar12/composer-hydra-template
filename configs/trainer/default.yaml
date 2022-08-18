@@ -3,3 +3,4 @@ device: gpu
 max_duration: 160ep
 grad_accum: auto
 run_name: ${name}
+seed: ${seed}
