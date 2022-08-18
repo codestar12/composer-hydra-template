@@ -1,7 +1,9 @@
 # --------- pytorch --------- #
 torch>=1.10.0
 torchvision>=0.11.0
-mosaicml[all]>=0.8.2
+# mosaicml[all]>=0.8.2
+# using a feature in dev post 0.9.0 will bump in next version
+git+https://github.com/mosaicml/composer@90778f9f1ac8514fbe65d6167d5d5b61224209cb#egg=mosaicml[all]
 torchmetrics>=0.7.0
 
 # --------- hydra --------- #

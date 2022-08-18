@@ -94,7 +94,7 @@ trainer:
   grad_accum: auto # Use automatic gradient accumulation to avoid OOMs
   save_folder: bert_checkpoints # The directory to save checkpoints to
   save_interval: 3500ba # Save checkpoints every 3500 batches
-eval_interval: 1000ba
+  eval_interval: 1000ba
 
 seed: 17
 
