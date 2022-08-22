@@ -16,7 +16,6 @@ model:
   tokenizer_name: bert-base-uncased
   pretrained_model_name: bert-base-uncased
 
-vocab_sz: ${vocab_size:}
 # Train the model on the English C4 corpus
 dataset:
   train_batch_size: 4096 # Number of training examples to use per update

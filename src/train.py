@@ -24,17 +24,11 @@ def train(config: DictConfig) -> None:
 
     model: ComposerModel = hydra.utils.instantiate(config.model)
 
-    try:
-        # hack to steal vocab size for config
-        OmegaConf.register_new_resolver(
-            "vocab_size", lambda: model.model.config.vocab_size
-        )
-    except:
-        print("couldn't access vocab size")
-        raise
-
     optimizer = hydra.utils.instantiate(config.optimizer, params=model.parameters())
 
+    # Load train dataset. Currently this expects to load according to the datasetHparam method.
+    # This means adding external datasets is currently not super easy. Will refactor or check for
+    # upstream composer changes that could make this easier.
     train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
     train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
     train_dataspec: DataSpec = None
@@ -42,6 +36,7 @@ def train(config: DictConfig) -> None:
         train_dataspec = hydra.utils.instantiate(
             config.dataset.train_dataspec,
             train_dataset.initialize_object(
+                # scale per device batch size so experiments are comparable across hardware.
                 config.dataset.train_batch_size // dist.get_world_size(),
                 train_dataloader,
             ),
@@ -88,6 +83,7 @@ def train(config: DictConfig) -> None:
 
         eval_set = evaluators
 
+    # Build list of loggers, callbacks, and algorithms to pass to trainer
     logger: List[LoggerDestination] = []
     callbacks: List[Callback] = []
     algorithms: List[Algorithm] = []
@@ -97,8 +93,11 @@ def train(config: DictConfig) -> None:
             if "_target_" in lg_conf:
                 print(f"Instantiating logger <{lg_conf._target_}>")
                 if log == "wandb":
-                    container = OmegaConf.to_container(config, resolve=True, throw_on_missing=True)
-                    wandb_logger = hydra.utils.instantiate(lg_conf, _partial_=True) # use _partail_ so it doesn't try to init everything 
+                    container = OmegaConf.to_container(
+                        config, resolve=True, throw_on_missing=True
+                    )
+                    # use _partial_ so it doesn't try to init everything
+                    wandb_logger = hydra.utils.instantiate(lg_conf, _partial_=True)
                     logger.append(wandb_logger(init_kwargs={"config": container}))
                 else:
                     logger.append(hydra.utils.instantiate(lg_conf))
