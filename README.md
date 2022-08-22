@@ -44,10 +44,6 @@ The default configs train a ResNet model on Cifar10. Switching to training Image
 
 Hydra configs are works in a hierarchical fashion. The config that ultimately gets created results from `config.yaml`
 
-values in yamls loaded last have take precident over values loaded first. Because experiment is loaded last all things configured in `configs/experiment/` are the ultimate source of truth. 
-
-✨ProTip✨ to see the final composed config passed to the trainer without running the job add `--cfg job`.
-
 ```
 defaults:
   - _self_                     # <-- configs defined in this yaml. They are overwritten by all following defaults
@@ -68,7 +64,9 @@ seed: 42
 name: hydra-test-run
 ```
 
-Values can also be overwritten/added on the commandline. Those values take ultimate precedent. 
+Values in yamls loaded last have take precident over values loaded first. Because experiment is loaded last all things configured in `configs/experiment/` are the ultimate source of truth. Values can also be overwritten/added on the commandline. Those values take ultimate precedent. 
+
+✨ProTip✨ to see the final composed config passed to the trainer without running the job add `--cfg job`.
 
 ```bash
 # Keys defined in the config can be overwritten on the commandline 
@@ -80,9 +78,9 @@ python run.py experiment=resnet_mild +trainer.grad_clip_norm=1.5
 
 # adding `++` will overwrite the key if defined or append the ky if not present
 python run.py experiment=resnet_mild ++trainer.grad_clip_norm=1.5 
-
-
 ```
+
+
 
 <details>
     <summary><h3>How is this different than yahp?</h3></summary>
