@@ -1,4 +1,5 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Dict
+from collections.abc import Iterable
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -7,8 +8,6 @@ from composer.loggers.logger_destination import LoggerDestination
 from composer.core import Algorithm, DataSpec
 from composer.core.evaluator import Evaluator
 from composer.utils import dist, reproducibility
-from pyparsing import Optional
-from sympy import OmegaPower
 
 
 def train(config: DictConfig) -> None:
@@ -29,59 +28,35 @@ def train(config: DictConfig) -> None:
     # Load train dataset. Currently this expects to load according to the datasetHparam method.
     # This means adding external datasets is currently not super easy. Will refactor or check for
     # upstream composer changes that could make this easier.
-    train_dataloader = hydra.utils.instantiate(config.dataset.train_dataloader)
-    train_dataset = hydra.utils.instantiate(config.dataset.train_dataset)
-    train_dataspec: DataSpec = None
-    if "train_dataspec" in config.dataset:
-        train_dataspec = hydra.utils.instantiate(
-            config.dataset.train_dataspec,
-            train_dataset.initialize_object(
-                # scale per device batch size so experiments are comparable across hardware.
-                config.dataset.train_batch_size // dist.get_world_size(),
-                train_dataloader,
-            ),
-        )
-    else:
-        train_dataspec = train_dataset.initialize_object(
-            config.dataset.train_batch_size // dist.get_world_size(), train_dataloader
-        )
+    train_dataloader: Union[Iterable, DataSpec, Dict[str, Any]] = hydra.utils.instantiate(
+        config.dataset.train_dataset, 
+        batch_size = config.dataset.train_batch_size // dist.get_world_size(),
+    )
+      
 
-    assert not (
-        "eval_dataset" in config.dataset and "evaluators" in config.dataset
-    ), f"evaluators and eval_dataset found in config.dataset. Use only one \n{OmegaConf.to_yaml(config.dataset)}"
 
     # Composer can take dataloaders, dataspecs, evaluators, or list of evaluators
     eval_set: Union[DataSpec, List[Evaluator]] = None
 
-    if "eval_dataset" in config.dataset:
-        eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
-        eval_dataset = hydra.utils.instantiate(config.dataset.eval_dataset)
-        if "eval_dataspec" in config.dataset:
-            eval_set = hydra.utils.instantiate(
-                config.dataset.eval_dataspec,
-                eval_dataset.initialize_object(
-                    config.dataset.eval_batch_size // dist.get_world_size(),
-                    eval_dataloader,
-                ),
-            )
-        else:
-            eval_set = eval_dataset.initialize_object(
-                config.dataset.eval_batch_size // dist.get_world_size(), eval_dataloader
-            )
-    else:
+    # assumes that evaluators is a nested dictionary with evalutor / dataloader pairs
+    if "evaluators" in config.dataset:
         evaluators = []
         for _, eval_conf in config.dataset.evaluators.items():
             print(OmegaConf.to_yaml(eval_conf))
-            eval_dataloader = hydra.utils.instantiate(config.dataset.eval_dataloader)
-            eval_ds = hydra.utils.instantiate(eval_conf.eval_dataset)
-            eval_ds = eval_ds.initialize_object(
+            eval_dataloader = hydra.utils.instantiate(
+                config.dataset.eval_dataloader,
                 config.dataset.eval_batch_size // dist.get_world_size(),
-                eval_dataloader,
             )
-            evaluator = hydra.utils.instantiate(eval_conf.evaluator, dataloader=eval_ds)
+            evaluator = hydra.utils.instantiate(eval_conf.evaluator, dataloader=eval_dataloader)
             evaluators.append(evaluator)
 
         eval_set = evaluators
+
+    else:
+        eval_set = hydra.utils.instantiate(
+            config.dataset.eval_dataset,
+            batch_size = config.dataset.eval_batch_size // dist.get_world_size()
+        )
 
     # Build list of loggers, callbacks, and algorithms to pass to trainer
     logger: List[LoggerDestination] = []
@@ -118,7 +93,7 @@ def train(config: DictConfig) -> None:
 
     trainer: Trainer = hydra.utils.instantiate(
         config.trainer,
-        train_dataloader=train_dataspec,
+        train_dataloader=train_dataloader,
         eval_dataloader=eval_set,
         optimizers=optimizer,
         model=model,
@@ -127,4 +102,5 @@ def train(config: DictConfig) -> None:
         schedulers=scheduler,
         callbacks=callbacks,
     )
+
     return trainer.fit()

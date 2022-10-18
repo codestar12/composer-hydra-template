@@ -10,7 +10,6 @@ defaults:
   - callbacks:  
     - lr_monitor.yaml
     - speed_monitor.yaml
-    - checkpoint.yaml
   - trainer: default.yaml
   - algorithms: null 
   - experiment: null

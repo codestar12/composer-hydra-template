@@ -4,36 +4,31 @@ train_batch_size: ${dataset.batch_size}
 eval_batch_size: ${dataset.batch_size}
 
 train_dataset:
-  _target_: composer.datasets.imagenet_hparams.StreamingImageNet1kHparams
-  remote: s3://mosaicml-internal-dataset-imagenet1k/mds/1/
+  _target_: composer.datasets.build_streaming_imagenet1k_dataloader
+  prefetch_factor: 2
+  num_workers: 8
+  version: 2
+  persistent_workers: true
+  pin_memory: true
+  timeout: 0
+  remote: s3://mosaicml-internal-dataset-imagenet1k/mds/2/
   local: /tmp/mds-cache/mds-imagenet1k/
   split: train
   resize_size: -1
   crop_size: 224
   shuffle: true
 
-train_dataloader:
-  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  prefetch_factor: 2
-  num_workers: 8
-  persistent_workers: true
-  pin_memory: true
-  timeout: 0
-
 
 eval_dataset:
-  _target_: composer.datasets.imagenet_hparams.StreamingImageNet1kHparams
-  remote: s3://mosaicml-internal-dataset-imagenet1k/mds/1/
+  _target_: composer.datasets.build_streaming_imagenet1k_dataloader
+  remote: s3://mosaicml-internal-dataset-imagenet1k/mds/2/
   local: /tmp/mds-cache/mds-imagenet1k/
   split: val
   resize_size: 256
+  version: 2
   crop_size: 224
   shuffle: false
   drop_last: false
-
-eval_dataloader:
-  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  # batch_size: 1024
   prefetch_factor: 2
   num_workers: 8
   persistent_workers: true
