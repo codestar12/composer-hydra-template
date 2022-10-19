@@ -44,7 +44,7 @@ def train(config: DictConfig) -> None:
         for _, eval_conf in config.dataset.evaluators.items():
             print(OmegaConf.to_yaml(eval_conf))
             eval_dataloader = hydra.utils.instantiate(
-                config.dataset.eval_dataloader,
+                eval_conf.eval_dataset,
                 config.dataset.eval_batch_size // dist.get_world_size(),
             )
             evaluator = hydra.utils.instantiate(eval_conf.evaluator, dataloader=eval_dataloader)

@@ -10,6 +10,21 @@ defaults:
 
 seed: 17
 
+logger:
+  wandb:
+    _target_: composer.loggers.WandBLogger
+    name: ${name}
+    project: hydra-test
+  progress_bar:
+    _target_: composer.loggers.ProgressBarLogger
+
+callbacks:
+  lr_monitor:
+    _target_: composer.callbacks.LRMonitor
+  speed_monitor:
+    _target_: composer.callbacks.SpeedMonitor
+    window_size: 100
+
 model:
   _target_: composer.models.create_bert_mlm
   use_pretrained: false
@@ -20,10 +35,11 @@ model:
 dataset:
   train_batch_size: 4096 # Number of training examples to use per update
   eval_batch_size: 2048
+  remote: s3://mosaicml-internal-dataset-c4/mds/2/
 
   train_dataset:
-    _target_: composer.datasets.c4_hparams.StreamingC4Hparams
-    remote: s3://allenai-c4/mds/1-gz/
+    _target_: composer.datasets.c4.build_streamingc4_dataloader
+    remote: ${dataset.remote}
     local: /tmp/mds-cache/mds-c4/
     split: train
     shuffle: true
@@ -32,19 +48,8 @@ dataset:
     group_method: truncate
     mlm: true
     mlm_probability: 0.15
-
-  train_dataloader:
-    _target_: composer.datasets.dataset_hparams.DataLoaderHparams
     pin_memory: true
-    timeout: 0
-    prefetch_factor: 2
-    persistent_workers: true
-    num_workers: 8
-
-  eval_dataloader:
-    _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-    pin_memory: true
-    timeout: 0
+    timeout: 120
     prefetch_factor: 2
     persistent_workers: true
     num_workers: 8
@@ -60,8 +65,8 @@ dataset:
           - LanguageCrossEntropy
           - MaskedAccuracy
       eval_dataset:
-        _target_: composer.datasets.c4_hparams.StreamingC4Hparams
-        remote: s3://allenai-c4/mds/1-gz/
+        _target_: composer.datasets.c4.build_streamingc4_dataloader
+        remote: ${dataset.remote}
         local: /tmp/mds-cache/mds-c4/
         split: val
         shuffle: false
@@ -70,6 +75,11 @@ dataset:
         group_method: truncate
         mlm: true
         mlm_probability: 0.15
+        pin_memory: true
+        timeout: 120
+        prefetch_factor: 2
+        persistent_workers: true
+        num_workers: 8
 
 # Run evaluation after every 1000 training steps
 
@@ -99,6 +109,3 @@ trainer:
   seed: ${seed}
 
 
-
-loggers:
-  progress_bar: {} # Add a TQDM progress bar
