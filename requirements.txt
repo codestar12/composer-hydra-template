@@ -1,5 +1,5 @@
 # --------- pytorch --------- #
-git+https://github.com/mosaicml/composer@d8a76ada81505fb2addf98c55ad0870efbae183b#egg=mosaicml[all]
+git+https://github.com/mosaicml/composer@3ed4a97a40585e6fb60201b81ac3f428e705e661#egg=mosaicml[all]
 torch>=1.10.0
 torchvision>=0.11.0
 # mosaicml[all]>=0.8.2
