@@ -3,34 +3,22 @@ train_batch_size: ${batch_size}
 eval_batch_size: ${batch_size}
 
 train_dataset:
-  _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
+  _target_: composer.datasets.build_cifar10_dataloader
   datadir: data/
+  is_train: true
   download: true
-
-train_dataloader:
-  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
+  drop_last: true
+  shuffle: true
   prefetch_factor: 2
   num_workers: 8
   persistent_workers: true
   pin_memory: true
   timeout: 0
-
-train_dataspec:
-  _target_: composer.core.DataSpec
 
 eval_dataset:
-  _target_: composer.datasets.cifar_hparams.CIFAR10DatasetHparams
+  _target_: composer.datasets.build_cifar10_dataloader
   datadir: data/
-  download: true
   is_train: false
-
-eval_dataloader:
-  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  prefetch_factor: 2
-  num_workers: 8
-  persistent_workers: true
-  pin_memory: true
-  timeout: 0
-
-eval_dataspec:
-  _target_: composer.core.DataSpec
+  download: true
+  drop_last: false
+  shuffle: false
