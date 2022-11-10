@@ -120,7 +120,3 @@ trainer:
     verbose: true
   seed: ${seed}
 
-
-
-loggers:
-  progress_bar: {} # Add a TQDM progress bar
