@@ -20,7 +20,7 @@ callbacks:
 
 logger:
   wandb:
-    _target_: composer.loggers.WandbLogger
+    _target_: composer.loggers.WandBLogger
     name: ${name}
     project: gpt-hydra-test
   progress_bar:
@@ -55,7 +55,7 @@ dataset:
   remote: s3://mosaicml-internal-dataset-c4/mds/2/
 
   train_dataset:
-    _target_: composer.datasets.c4.build_streamingc4_dataloader
+    _target_: src.dataset.c4.data_c4.build_c4_dataloader
     remote: ${dataset.remote}
     local: /tmp/mds-cache/mds-c4/
     split: train
@@ -63,23 +63,27 @@ dataset:
     tokenizer_name: *tokenizer_name
     max_seq_len: *max_seq_len
     group_method: concat
+    prefetch: 1_000_000
     pin_memory: true
     timeout: 120
+    drop_last: true
     prefetch_factor: 2
     persistent_workers: true
     num_workers: 8
 
   eval_dataset:
-    _target_: composer.datasets.c4.build_streamingc4_dataloader
+    _target_: src.dataset.c4.data_c4.build_c4_dataloader
     remote: ${dataset.remote}
     local: /tmp/mds-cache/mds-c4/
     split: val
     shuffle: false
+    prefetch: 1000
     tokenizer_name: *tokenizer_name
     max_seq_len: *max_seq_len
-    group_method: concat
+    group_method: truncate
     pin_memory: true
     timeout: 120
+    drop_last: false
     prefetch_factor: 2
     persistent_workers: true
     num_workers: 8
