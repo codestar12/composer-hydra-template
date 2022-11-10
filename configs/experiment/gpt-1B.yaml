@@ -14,7 +14,7 @@ callbacks:
     _target_: composer.callbacks.lr_monitor.LRMonitor
   speed_monitor:
     _target_: composer.callbacks.speed_monitor.SpeedMonitor
-    window_size: 1
+    window_size: 10
   memory_monitor:
     _target_: composer.callbacks.MemoryMonitor
 
@@ -32,12 +32,12 @@ max_seq_len: &max_seq_len 2048
 
 model:
   _target_: src.models.llm.gpt.ComposerGPT
-  _recursive_: false
+  _recursive_: false # leave cfg as an OmegaConf object to pass to constructor
   cfg:
     tokenizer_name: *tokenizer_name
-    d_model: 768
-    n_heads: 12
-    n_layers: 12
+    d_model: 2048
+    n_heads: 16
+    n_layers: 24
     mlp_ratio: 4
     max_seq_len: *max_seq_len
     vocab_size: 50257
@@ -50,8 +50,8 @@ model:
 
 # Train the model on the English C4 corpus
 dataset:
-  train_batch_size: 256 # Number of training examples to use per update
-  eval_batch_size: 64
+  train_batch_size: 512 # Number of training examples to use per update
+  eval_batch_size: 16
   remote: s3://mosaicml-internal-dataset-c4/mds/2/
 
   train_dataset:
@@ -93,7 +93,7 @@ dataset:
 # Use the decoupled AdamW optimizer with learning rate warmup
 optimizer:
   _target_: composer.optim.DecoupledAdamW
-  lr: 6.0e-4 # Peak learning rate
+  lr: 2.0e-4 # Peak learning rate
   betas:
     - 0.9
     - 0.95
@@ -107,19 +107,19 @@ scheduler:
   t_max: 1dur
 
 trainer:
-  max_duration: 4800ba 
+  max_duration: 24800ba  # ~ 26B tokens
   precision: bf16 
   grad_clip_norm: 1.0 
   grad_accum: auto # Use automatic gradient accumulation to avoid OOMs
   # save_folder: bert_checkpoints # The directory to save checkpoints to
-  save_interval: 500ba # Save checkpoints every 500 batches
-  eval_interval: 500ba
+  save_interval: 2000ba # Save checkpoints every 500 batches
+  eval_interval: 2000ba
   fsdp_config:
-    _convert_: partial
+    _convert_: partial # convert Omegaconf to dicstionary to pass arg
     sharding_strategy: FULL_SHARD
-    min_params: 1e8
+    min_params: 2e8
     mixed_precision: DEFAULT
-    activation_checkpointing: false
+    activation_checkpointing: true
     activation_cpu_offload: false
     verbose: true
   seed: ${seed}
