@@ -1,9 +1,10 @@
 # --------- pytorch --------- #
-torch<1.13
+torch==1.13
 torchvision<0.14
 torchtext<0.14
-git+https://github.com/mosaicml/composer@a1d359307f744931537e4a70fc4e9c86d2312f63#egg=mosaicml[all]
-flash_attn @ git+https://github.com/HazyResearch/flash-attention.git@main
+mosaicml[all]==0.11.0
+#git+https://github.com/mosaicml/composer@a1d359307f744931537e4a70fc4e9c86d2312f63#egg=mosaicml[all]
+#flash_attn @ git+https://github.com/HazyResearch/flash-attention.git@main
 # mosaicml[all]>=0.8.2
 # using a feature in dev post 0.9.0 will bump in next version
 torchmetrics>=0.9.0
