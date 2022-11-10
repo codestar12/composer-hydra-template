@@ -1,6 +1,6 @@
 batch_size: 1024
-train_batch_size: ${batch_size}
-eval_batch_size: ${batch_size}
+train_batch_size: ${dataset.batch_size}
+eval_batch_size: ${dataset.batch_size}
 
 train_dataset:
   _target_: composer.datasets.build_cifar10_dataloader
