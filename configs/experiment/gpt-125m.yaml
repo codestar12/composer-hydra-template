@@ -1,0 +1,116 @@
+# @package _global_
+defaults:
+ - override /trainer: default.yaml
+ - override /model: null
+ - override /dataset: null
+ - override /scheduler: null
+ - override /optimizer: null
+ - override /logger: null
+ - override /algorithms: null
+
+seed: 17
+tokenizer_name: gpt2
+
+model:
+  _target_: src.models.llm.gpt.ComposerGPT
+  _recursive_: false
+  cfg:
+    tokenizer_name: ${tokenizer_name}
+    d_model: 768
+    n_heads: 12
+    n_layers: 12
+    mlp_ratio: 4
+    max_seq_len: *max_seq_len
+    vocab_size: 50257
+    init_std: 0.02
+    attn_pdrop: 0.0
+    resid_pdrop: 0.0
+    emb_pdrop: 0.0
+    attn_impl: flash
+
+# Train the model on the English C4 corpus
+dataset:
+  train_batch_size: 4096 # Number of training examples to use per update
+  eval_batch_size: 2048
+
+  train_dataset:
+    _target_: composer.datasets.c4_hparams.StreamingC4Hparams
+    remote: s3://allenai-c4/mds/1-gz/
+    local: /tmp/mds-cache/mds-c4/
+    split: train
+    shuffle: true
+    tokenizer_name: bert-base-uncased
+    max_seq_len: 128
+    group_method: truncate
+    mlm: true
+    mlm_probability: 0.15
+
+  train_dataloader:
+    _target_: composer.datasets.dataset_hparams.DataLoaderHparams
+    pin_memory: true
+    timeout: 0
+    prefetch_factor: 2
+    persistent_workers: true
+    num_workers: 8
+
+  eval_dataloader:
+    _target_: composer.datasets.dataset_hparams.DataLoaderHparams
+    pin_memory: true
+    timeout: 0
+    prefetch_factor: 2
+    persistent_workers: true
+    num_workers: 8
+
+  # Periodically evaluate the LanguageCrossEntropy and Masked Accuracy
+  # on the validation split of the dataset.
+  evaluators:
+    pretraining:
+      evaluator:
+        _target_: composer.core.evaluator.Evaluator
+        label: bert_pre_training
+        metric_names:
+          - LanguageCrossEntropy
+          - MaskedAccuracy
+      eval_dataset:
+        _target_: composer.datasets.c4_hparams.StreamingC4Hparams
+        remote: s3://allenai-c4/mds/1-gz/
+        local: /tmp/mds-cache/mds-c4/
+        split: val
+        shuffle: false
+        tokenizer_name: bert-base-uncased
+        max_seq_len: 128
+        group_method: truncate
+        mlm: true
+        mlm_probability: 0.15
+
+# Run evaluation after every 1000 training steps
+
+# Use the decoupled AdamW optimizer with learning rate warmup
+optimizer:
+  _target_: composer.optim.DecoupledAdamW
+  lr: 5.0e-4 # Peak learning rate
+  betas:
+    - 0.9
+    - 0.98
+  eps: 1.0e-06
+  weight_decay: 1.0e-5 # Amount of weight decay regularization
+
+scheduler:
+  _target_: composer.optim.scheduler.LinearWithWarmupScheduler
+  t_warmup: 0.06dur # Point when peak learning rate is reached
+  alpha_f: 0.02
+
+trainer:
+  max_duration: 286720000sp # Subsample the training data for ~275M samples
+  precision: amp # Use mixed-precision training
+  grad_clip_norm: -1.0 # Turn off gradient clipping
+  grad_accum: auto # Use automatic gradient accumulation to avoid OOMs
+  save_folder: bert_checkpoints # The directory to save checkpoints to
+  save_interval: 3500ba # Save checkpoints every 3500 batches
+  eval_interval: 1000ba
+  seed: ${seed}
+
+
+
+loggers:
+  progress_bar: {} # Add a TQDM progress bar
