@@ -1,10 +1,14 @@
 # --------- pytorch --------- #
-git+https://github.com/mosaicml/composer@d8a76ada81505fb2addf98c55ad0870efbae183b#egg=mosaicml[all]
-torch>=1.10.0
-torchvision>=0.11.0
+torch<1.13
+torchvision<0.14
+torchtext<0.14
+git+https://github.com/mosaicml/composer@a1d359307f744931537e4a70fc4e9c86d2312f63#egg=mosaicml[all]
+flash_attn @ git+https://github.com/HazyResearch/flash-attention.git@main
 # mosaicml[all]>=0.8.2
 # using a feature in dev post 0.9.0 will bump in next version
-torchmetrics>=0.7.0
+torchmetrics>=0.9.0
+
+
 
 # --------- hydra --------- #
 hydra-core>=1.2
@@ -32,7 +36,7 @@ python-dotenv   # loading env variables from .env file
 rich            # beautiful text formatting in terminal
 pytest          # tests
 sh              # for running bash commands in some tests
-scikit-learn    # used in some callbacks
-seaborn         # used in some callbacks
-jupyterlab      # better jupyter notebooks
+#scikit-learn    # used in some callbacks
+#seaborn         # used in some callbacks
+#jupyterlab      # better jupyter notebooks
 pudb            # debugger
