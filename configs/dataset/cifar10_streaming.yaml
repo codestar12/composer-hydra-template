@@ -16,31 +16,16 @@ train_dataset:
   pin_memory: true
   timeout: 0
 
-train_dataloader:
-  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
-  prefetch_factor: 2
-  num_workers: 8
-  persistent_workers: true
-  pin_memory: true
-  timeout: 0
-
-train_dataspec:
-  _target_: composer.core.DataSpec
-
 eval_dataset:
-  _target_: composer.datasets.cifar_hparams.StreamingCIFAR10Hparams
+  _target_: composer.datasets.build_streaming_cifar10_dataloader
   remote: s3://mosaicml-internal-dataset-cifar10/mds/1/
   local: /tmp/mds-cache/mds-cifar10/
+  version: 2
   split: val
   shuffle: false
-
-eval_dataloader:
-  _target_: composer.datasets.dataset_hparams.DataLoaderHparams
+  drop_last: false
   prefetch_factor: 2
   num_workers: 8
   persistent_workers: true
   pin_memory: true
   timeout: 0
-
-eval_dataspec:
-  _target_: composer.core.DataSpec
