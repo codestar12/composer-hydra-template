@@ -6,7 +6,7 @@ train_dataset:
   _target_: composer.datasets.build_streaming_cifar10_dataloader
   remote: s3://mosaicml-internal-dataset-cifar10/mds/1/
   local: /tmp/mds-cache/mds-cifar10/
-  version: 2
+  version: 1
   split: train
   shuffle: true
   drop_last: true
@@ -20,7 +20,7 @@ eval_dataset:
   _target_: composer.datasets.build_streaming_cifar10_dataloader
   remote: s3://mosaicml-internal-dataset-cifar10/mds/1/
   local: /tmp/mds-cache/mds-cifar10/
-  version: 2
+  version: 1
   split: val
   shuffle: false
   drop_last: false

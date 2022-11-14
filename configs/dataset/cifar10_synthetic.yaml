@@ -4,7 +4,6 @@ eval_batch_size: ${dataset.batch_size}
 
 train_dataset:
   _target_: composer.datasets.build_synthetic_cifar10_dataloader
-  datadir: data/
   is_train: true
   download: true
   drop_last: true
@@ -19,7 +18,6 @@ train_dataset:
 
 eval_dataset:
   _target_: composer.datasets.build_synthetic_cifar10_dataloader
-  datadir: data/
   is_train: false
   download: true
   drop_last: false
