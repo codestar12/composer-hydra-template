@@ -12,7 +12,7 @@ To launch composer with hydra simply run
 
 The default configs train a ResNet model on Cifar10. Switching to training Imagenet with ResNet50 and adding wandb logging is as simple as overwriting the defaults on the commandline.
 
-`composer -n <n> run.py model=resnet.yaml dataset=streaming_imagenet.yaml logger=wandb.yaml`
+`composer -n <n> run.py model=resnet.yaml dataset=imagenet_streaming.yaml logger=wandb.yaml`
 
 ## Project Structure
 

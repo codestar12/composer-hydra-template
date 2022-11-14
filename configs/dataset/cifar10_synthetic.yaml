@@ -3,7 +3,7 @@ train_batch_size: ${dataset.batch_size}
 eval_batch_size: ${dataset.batch_size}
 
 train_dataset:
-  _target_: composer.datasets.build_cifar10_dataloader
+  _target_: composer.datasets.build_synthetic_cifar10_dataloader
   datadir: data/
   is_train: true
   download: true
@@ -14,9 +14,11 @@ train_dataset:
   persistent_workers: true
   pin_memory: true
   timeout: 0
+  num_unique_samples: 100
+  device: 'cpu'
 
 eval_dataset:
-  _target_: composer.datasets.build_cifar10_dataloader
+  _target_: composer.datasets.build_synthetic_cifar10_dataloader
   datadir: data/
   is_train: false
   download: true
@@ -27,3 +29,5 @@ eval_dataset:
   persistent_workers: true
   pin_memory: true
   timeout: 0
+  num_unique_samples: 100
+  device: 'cpu'
